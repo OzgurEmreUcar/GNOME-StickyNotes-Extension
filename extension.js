@@ -38,10 +38,10 @@ function enable() {
     note = new St.Entry({
         name: 'noteEntry',
         can_focus: true,
-        hint_text: _("Type here…"),
         track_hover: true,
         x_expand: true,
         style_class: 'notesTextField',
+        text: 'Type here...'
     });
 
     const clutterText = note.get_clutter_text();
@@ -65,7 +65,6 @@ function enable() {
 
     Main.uiGroup.add_child(scrollBox);
     scrollBox.set_position(100, 100);
-    scrollBox.raise_top();
 }
 
 function disable() {
