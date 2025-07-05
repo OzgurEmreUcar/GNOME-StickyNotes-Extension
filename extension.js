@@ -8,6 +8,7 @@ const Clutter = imports.gi.Clutter;
 let scrollBox, noteBox, note, settings, dragButton;
 let dragStartX = 0, dragStartY = 0;
 let actorStartX = 0, actorStartY = 0;
+let dragActive = false;
 
 function init() {
     const GioSSS = Gio.SettingsSchemaSource;
@@ -37,9 +38,8 @@ function enable() {
         can_focus: false,
     });
 
-    // Drag handle button
     dragButton = new St.Button({
-        label: "☰", // You can use an icon or emoji
+        label: "☰",
         style_class: 'drag-handle',
         can_focus: false,
         reactive: true,
@@ -48,30 +48,46 @@ function enable() {
         y_align: St.Align.MIDDLE,
     });
 
-    // Add pointer event handlers
+    // Dragging handlers with global pointer grab for smooth drag
     dragButton.connect('button-press-event', (actor, event) => {
+        dragActive = true;
         const [x, y] = event.get_coords();
         dragStartX = x;
         dragStartY = y;
         [actorStartX, actorStartY] = scrollBox.get_position();
+
+        // Grab pointer globally so motion events continue outside actor
+        Main.uiGroup.get_stage().set_key_focus(null);
+        actor.grab_pointer();
+
         return Clutter.EVENT_STOP;
     });
 
     dragButton.connect('motion-event', (actor, event) => {
+        if (!dragActive)
+            return Clutter.EVENT_PROPAGATE;
+
         const state = event.get_state();
         if (state & Clutter.ModifierType.BUTTON1_MASK) {
             const [x, y] = event.get_coords();
             const dx = x - dragStartX;
             const dy = y - dragStartY;
             scrollBox.set_position(actorStartX + dx, actorStartY + dy);
+            return Clutter.EVENT_STOP;
         }
+        return Clutter.EVENT_PROPAGATE;
+    });
+
+    dragButton.connect('button-release-event', (actor, event) => {
+        dragActive = false;
+        actor.ungrab_pointer();
         return Clutter.EVENT_STOP;
     });
 
     note = new St.Entry({
         name: 'noteEntry',
         can_focus: true,
-        hint_text: _("Type here…"),
+        text: "Type here…",
         track_hover: true,
         x_expand: true,
         style_class: 'notesTextField',
@@ -98,7 +114,22 @@ function enable() {
 
     Main.uiGroup.add_child(scrollBox);
     scrollBox.set_position(100, 100);
-    scrollBox.raise_top();
+
+    // Explicitly focus note to allow typing right away
+    note.grab_key_focus();
+
+    // Also listen for focus-out event to regrab focus if needed
+note.connect('notify::has-focus', () => {
+    if (!note.has_focus()) {
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+            if (!note.has_focus()) {
+                note.grab_key_focus();
+            }
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+});
+
 }
 
 function disable() {
