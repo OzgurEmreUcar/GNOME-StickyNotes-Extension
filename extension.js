@@ -36,6 +36,7 @@ function enable() {
         visible: true,
         track_hover: true,
         can_focus: false,
+
     });
 
     dragButton = new St.Button({
@@ -90,7 +91,8 @@ function enable() {
         text: "Type here…",
         track_hover: true,
         x_expand: true,
-        style_class: 'notesTextField',
+
+        style_class: 'sticky-note'
     });
 
     const clutterText = note.get_clutter_text();

@@ -1,14 +1,18 @@
 .sticky-note {
-  background-color: #fff59d;
-  border: 2px solid #fbc02d;
+  background-color: rgba(0, 0, 0, 0.8); /* Slightly more opaque */
+  border: 2px solid #1ce9e8;
   border-radius: 8px;
-  color: black;
+  color: white;
   padding: 10px;
   font-size: 16px;
+
+  /* Softer glow effect */
+  box-shadow: 0 0 4px #1ce9e8, 0 0 6px rgba(28, 233, 232, 0.5);
 }
+
+
 .drag-handle {
   padding: 4px 8px;
-  background-color: #ccc;
   border-radius: 5px 0 0 5px;
   font-weight: bold;
 }
