@@ -1,0 +1,8 @@
+<schemalist>
+  <schema id="org.gnome.shell.extensions.sticky" path="/org/gnome/shell/extensions/sticky/">
+    <key name="note-text" type="s">
+      <default>'Hello from Sticky Note!'</default>
+      <summary>Text of the sticky note</summary>
+    </key>
+  </schema>
+</schemalist>
