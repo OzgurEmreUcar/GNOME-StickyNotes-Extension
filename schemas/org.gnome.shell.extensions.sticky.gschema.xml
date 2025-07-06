@@ -4,5 +4,13 @@
       <default>'Hello from Sticky Note!'</default>
       <summary>Text of the sticky note</summary>
     </key>
+    <key name="note-position-x" type="i">
+    <default>100</default>
+    <summary>X position of the sticky note</summary>
+  </key>
+  <key name="note-position-y" type="i">
+    <default>100</default>
+    <summary>Y position of the sticky note</summary>
+  </key>
   </schema>
 </schemalist>

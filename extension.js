@@ -5,10 +5,11 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Pango = imports.gi.Pango;
 const Clutter = imports.gi.Clutter;
 
-let scrollBox, noteBox, note, settings, dragButton;
+let scrollBox, noteBox, note, settings, dragButton, changeStateButton;
 let dragStartX = 0, dragStartY = 0;
 let actorStartX = 0, actorStartY = 0;
 let dragActive = false;
+let changeState = true;
 
 function init() {
     const GioSSS = Gio.SettingsSchemaSource;
@@ -19,6 +20,27 @@ function init() {
 }
 
 function enable() {
+    initializeComponents();
+    noteDrag();
+    saveText();
+    createComponentTree();
+    regrabFocus();
+    changeNoteState();
+}
+
+function disable() {
+    if (scrollBox) {
+        scrollBox.destroy();
+        scrollBox = null;
+    }
+    if(changeStateButton){
+        changeStateButton.destroy();
+        changeStateButton = null;      
+    }
+}
+
+function initializeComponents()
+{
     scrollBox = new St.ScrollView({
         overlay_scrollbars: true,
         x_expand: true,
@@ -39,6 +61,16 @@ function enable() {
 
     });
 
+    note = new St.Entry({
+        name: 'noteEntry',
+        can_focus: true,
+        text: "Type here…",
+        track_hover: true,
+        x_expand: true,
+
+        style_class: 'sticky-note'
+    });
+
     dragButton = new St.Button({
         label: "☰",
         style_class: 'drag-handle',
@@ -49,6 +81,19 @@ function enable() {
         y_align: St.Align.MIDDLE,
     });
 
+    changeStateButton = new St.Button({        
+        label: "🐦",
+        style_class: 'drag-handle',
+        can_focus: true,
+        reactive: true,
+        track_hover: true,
+        x_align: St.Align.START,
+        y_align: Clutter.ActorAlign.CENTER,
+    });
+}
+
+function noteDrag()
+{
     // Dragging handlers with global pointer grab for smooth drag
     dragButton.connect('button-press-event', (actor, event) => {
         dragActive = true;
@@ -80,21 +125,19 @@ function enable() {
     });
 
     dragButton.connect('button-release-event', (actor, event) => {
+         
+        let [currentX, currentY] = scrollBox.get_transformed_position();
+        settings.set_int('note-position-x',  Math.round(currentX));
+        settings.set_int('note-position-y',  Math.round(currentY));  
         dragActive = false;
-        actor.ungrab_pointer();
+        actor.ungrab_pointer();    
+
         return Clutter.EVENT_STOP;
     });
+}
 
-    note = new St.Entry({
-        name: 'noteEntry',
-        can_focus: true,
-        text: "Type here…",
-        track_hover: true,
-        x_expand: true,
-
-        style_class: 'sticky-note'
-    });
-
+function saveText()
+{
     const clutterText = note.get_clutter_text();
     clutterText.set_single_line_mode(false);
     clutterText.set_activatable(false);
@@ -110,33 +153,49 @@ function enable() {
     if (savedText)
         note.set_text(savedText);
 
-    noteBox.add_child(dragButton);
-    noteBox.add_child(note);
-    scrollBox.add_actor(noteBox);
-
-    Main.uiGroup.add_child(scrollBox);
-    scrollBox.set_position(100, 100);
-
-    // Explicitly focus note to allow typing right away
-    note.grab_key_focus();
-
-    // Also listen for focus-out event to regrab focus if needed
-note.connect('notify::has-focus', () => {
-    if (!note.has_focus()) {
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
-            if (!note.has_focus()) {
-                note.grab_key_focus();
-            }
-            return GLib.SOURCE_REMOVE;
-        });
-    }
-});
 
 }
 
-function disable() {
-    if (scrollBox) {
-        scrollBox.destroy();
-        scrollBox = null;
-    }
+function createComponentTree()
+{
+    noteBox.add_child(dragButton);
+    noteBox.add_child(note);
+    scrollBox.add_actor(noteBox);
+    Main.layoutManager._backgroundGroup.add_child(scrollBox);
+    scrollBox.set_position(settings.get_int('note-position-x'), settings.get_int('note-position-y'));
+    note.grab_key_focus();
+}
+
+function regrabFocus()
+{
+    // Also listen for focus-out event to regrab focus if needed
+    note.connect('notify::has-focus', () => {
+        if (!note.has_focus()) {
+            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+                if (!note.has_focus()) {
+                    note.grab_key_focus();
+                }
+                return GLib.SOURCE_REMOVE;
+            });
+        }
+    });
+}
+
+function changeNoteState()
+{
+    changeStateButton.connect('button-press-event', (actor, event) => {
+        changeState = !changeState;
+        if(changeState)
+        {
+            Main.uiGroup.remove_child(scrollBox);
+            Main.layoutManager._backgroundGroup.add_child(scrollBox);
+        }
+        else
+        {
+            Main.layoutManager._backgroundGroup.remove_child(scrollBox);
+            Main.uiGroup.add_child(scrollBox);
+        }           
+    });
+
+    Main.panel._rightBox.insert_child_at_index(changeStateButton, 0);
 }
