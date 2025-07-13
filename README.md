@@ -2,6 +2,8 @@
 
 A simple GNOME Shell extension that adds one draggable, editable sticky note to your desktop — perfect for jotting down quick reminders or ideas.
 
+<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/7330b37f-2588-45d1-aff3-710213b6e5af" />
+
 ---
 
 ## About GNOME
