@@ -28,7 +28,6 @@ GJS (GNOME JavaScript) is the JavaScript environment used to write GNOME Shell e
 - Drag and reposition the note anywhere on your desktop.
 - Persistent saving of note content and position across sessions.
 - Toggle the note’s layering to keep it above or below other windows.
-- Add or remove the sticky note with a panel button.
 - Lightweight and unobtrusive.
 
 ---
