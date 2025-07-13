@@ -4,6 +4,6 @@
     "description": "A simple sticky note on your desktop",
     "version": 1,
     "shell-version": ["42","45", "46"], 
-    "url": "https://github.com/yourname/sticky"
+    "url": "https://github.com/OzgurEmreUcar/GNOME-StickyNotes-Extension"
   }
   
