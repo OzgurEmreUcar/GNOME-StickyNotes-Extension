@@ -50,3 +50,16 @@ Then enable the extension using GNOME Extensions app or by running:
 
 ```bash
 gnome-extensions enable StickyNotes@ozgur
+```
+---
+
+## Important: Add Your Shell Version
+
+Before enabling the extension, edit the metadata.json file and make sure your GNOME Shell version is listed under "shell-version":
+
+```json
+"shell-version": ["45", "46"]
+```
+To find your shell version, run:
+```bash
+gnome-shell --version
