@@ -8,35 +8,45 @@ const Me = ExtensionUtils.getCurrentExtension();  // Reference to the current ex
 function createComponents() {
     // The outer scrollable container, allows future flexibility for overflow content
     const scrollBox = new St.ScrollView({
-        overlay_scrollbars: true,     // Show scrollbars when hovered
-        reactive: true,               // Responds to input events
-        track_hover: true,            // Reacts to hover events
-        clip_to_allocation: true,     // Clips drawing to allocated space
+        overlay_scrollbars: true,
+        x_expand: true,
+        y_expand: true,
+        clip_to_allocation: true,
+        reactive: true,
+        track_hover: true,
+        can_focus: false,
     });
 
     // A box that holds both the drag button and the text entry
     const noteBox = new St.BoxLayout({
         reactive: true,
-        x_expand: true,               // Expand horizontally
-        y_expand: true,               // Expand vertically
+        x_expand: true,
+        y_expand: true,
+        visible: true,
+        track_hover: true,
+        can_focus: false,
     });
 
     // The actual text entry field where the user types
     const note = new St.Entry({
         name: 'noteEntry',
-        text: 'Type here…',          // Default placeholder text
-        can_focus: true,             // Can receive keyboard focus
-        x_expand: true,
+        can_focus: true,
+        text: "Type here…",
         track_hover: true,
-        style_class: 'sticky-note',  // CSS class for styling
+        x_expand: true,
+
+        style_class: 'sticky-note'
     });
 
     // Button for dragging the note around, with a handle icon
     const dragButton = new St.Button({
-        label: '☰',                   // Menu/drag handle icon
-        style_class: 'drag-handle',   // CSS class for styling
+        label: "☰",
+        style_class: 'drag-handle',
+        can_focus: false,
         reactive: true,
-        can_focus: false,             // No focus needed
+        track_hover: true,
+        x_align: St.Align.START,
+        y_align: St.Align.MIDDLE,
     });
 
     // Assemble the UI hierarchy

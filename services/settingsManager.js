@@ -59,6 +59,7 @@ function restoreText(note) {
 
     // Configure the text to wrap properly (multi-line)
     clutterText.set_single_line_mode(false);
+    clutterText.set_activatable(false);
     clutterText.set_line_wrap(true);
     clutterText.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR);
 
